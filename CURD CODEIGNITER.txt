@@ -1,0 +1,122 @@
+user.php 
+
+<form method="post" action="<?= base_url('/users/insert') ?>"> <!-- Adjust the action URL -->
+	<div class="mb-3">
+		<label for="exampleInputEmail1" class="form-label">User Name</label>
+		<input type="text" class="form-control" name="username" id="username">
+	</div>
+	<div class="mb-3">
+		<label for="exampleInputEmail1" class="form-label">Email </label>
+		<input type="email" class="form-control" name="email" id="email">
+	</div>
+	<div class="mb-3">
+		<label for="exampleInputPassword1" class="form-label">Password</label>
+		<input type="password" class="form-control" name="password" id="password">
+	</div>
+	
+	<button type="submit" class="btn btn-secondary">Submit</button>
+</form>
+
+UserModel.php
+
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class UserModel extends Model
+{
+    protected $table = 'users'; // Replace 'users' with your actual table name
+    protected $primaryKey = 'id'; // Replace 'id' with your primary key field name if different
+    protected $allowedFields = ['username', 'email', 'password']; // Define the fields you want to insert
+}
+
+?>
+
+UserController.php
+
+<?php
+
+namespace App\Controllers;
+
+use CodeIgniter\Controller;
+use App\Models\UserModel;
+
+class UserController extends BaseController
+{
+
+	//Insert user information
+    public function insertUser()
+    {
+        $model = new UserModel();
+
+        $data = [
+            'name' => $this->request->getPost('name'),
+            'email' => $this->request->getPost('email'),
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+        ];
+
+        if ($model->insert($data)) {
+            echo 'User inserted successfully.';
+        } else {
+            echo 'Error inserting user.';
+        }
+    }
+	
+	
+
+
+	
+}
+
+?>
+
+Fetch all user data from the database :
+-----
+
+UserController.php
+
+<?php
+
+namespace App\Controllers;
+
+use CodeIgniter\Controller;
+use App\Models\UserModel;
+
+class UserController extends BaseController
+{
+	
+	//Fetch all user data
+    public function getAllUsers()
+    {
+        $model = new UserModel();
+        $data['users'] = $model->findAll();
+
+        return view('user_list', $data);
+    }
+		
+}
+
+?>
+
+<!-- app/Views/user_list.php -->
+<h1>User List</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($users as $user) : ?>
+            <tr>
+                <td><?= $user['id'] ?></td>
+                <td><?= $user['username'] ?></td>
+                <td><?= $user['email'] ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

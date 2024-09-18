@@ -1,0 +1,177 @@
+CodeIgniter 3:
+
+View : 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+</head>
+<body>
+    <h1>User Registration</h1>
+    <?php echo validation_errors(); ?>
+    <?php echo form_open('users/insert'); ?>
+        <label for="username">Username:</label>
+        <input type="text" name="username" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br>
+
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
+
+Model : User_model.php
+
+<?php
+class User_model extends CI_Model 
+{
+   
+   public function insert_user($data) 
+   {
+       $this->db->insert('users', $data);
+       return $this->db->insert_id();
+   }
+}
+
+Controller : Users.php 
+
+<?php
+class Users extends CI_Controller 
+{
+   
+   public function __construct() 
+   {
+       parent::__construct();
+       $this->load->model('user_model');
+   }
+   
+   public function insert() 
+   {
+       // Load the form helper
+       $this->load->helper('form');
+
+       // Load the form validation library
+       $this->load->library('form_validation');
+
+       // Set validation rules (customize as needed)
+       $this->form_validation->set_rules('username', 'Username', 'required');
+       $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+       $this->form_validation->set_rules('password', 'Password', 'required');
+
+       if ($this->form_validation->run() === FALSE) 
+	   {
+           // If form validation fails, load the form view
+           $this->load->view('user_form');
+       } 
+	   else 
+	   {
+           // If form validation is successful, insert user data
+           $data = array(
+               'username' => $this->input->post('username'),
+               'email' => $this->input->post('email'),
+               'password' => password_hash($this->input->post('password'), PASSWORD_BCRYPT), // Hash the password
+           );
+
+           $inserted_id = $this->user_model->insert_user($data);
+
+           if ($inserted_id) 
+		   {
+               echo 'User inserted successfully with ID: ' . $inserted_id;
+           } 
+		   else 
+		   {
+               echo 'User insertion failed';
+           }
+       }
+   }
+}
+
+
+To fetch and display all user data?:
+
+Model : User_model.php
+
+<?php
+class User_model extends CI_Model 
+{
+   
+   public function get_all_users() 
+   {
+       // Fetch all user data from the 'users' table
+       $query = $this->db->get('users');
+       
+       if ($query->num_rows() > 0) 
+	   {
+           return $query->result(); // Return an array of user data
+       } 
+	   else 
+	   {
+           return array(); // No users found
+       }
+   }
+}
+
+
+Controller : sers.php
+
+<?php
+class Users extends CI_Controller 
+{
+   
+   public function __construct() 
+   {
+       parent::__construct();
+       $this->load->model('user_model');
+   }
+   
+   public function list() 
+   {
+       // Call the model method to fetch all user data
+       $users = $this->user_model->get_all_users();
+       
+       // Load a view to display all user data
+       $data['users'] = $users;
+       $this->load->view('user_list', $data);
+   }
+}
+
+
+View : user_list.php
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List of Users</title>
+</head>
+<body>
+    <h1>List of Users</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <!-- Add more user data fields here as table headers -->
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><?php echo $user->id; ?></td>
+                    <td><?php echo $user->username; ?></td>
+                    <td><?php echo $user->email; ?></td>
+					<td>
+                        <a href="<?php echo base_url('users/edit/' . $user->id); ?>">Edit</a>
+                    </td>
+                    <!-- Add more user data fields here as table cells -->
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</body>
+</html>

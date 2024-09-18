@@ -1,0 +1,60 @@
+ php-mime-mail-parser Library : 
+ 
+ Here are the steps on how to install php-mime-mail-parser for your project:
+
+1. Check for Mailparse Extension:
+
+Before starting, ensure you have the mailparse extension installed, as it's a prerequisite for php-mime-mail-parser.
+Check its availability using the command:
+Bash
+php -m | grep mailparse
+Use code with caution. Learn more
+If it's not listed, proceed to 
+
+step 2.
+2. Install Mailparse Extension (if needed):
+
+For Linux/Unix systems:
+Use a package manager like apt or yum to install it. For example, on Ubuntu/Debian:
+Bash
+sudo apt install php-mailparse
+Use code with caution. Learn more
+For Windows or manual installation:
+Download the DLL from http://pecl.php.net/package/mailparse
+Add the following line to your php.ini file:
+Ini, TOML
+extension=php_mailparse.dll
+Use code with caution. Learn more
+
+3. Install php-mime-mail-parser:
+
+Using Composer (recommended):
+If you have Composer, install it using:
+Bash
+composer require php-mime-mail-parser/php-mime-mail-parser
+Use code with caution. Learn more
+Manual installation:
+Download the library from https://github.com/php-mime-mail-parser/php-mime-mail-parser
+Extract it into your project's directory.
+
+4. Use in Your Project:
+
+Once installed, include the required files in your PHP scripts:
+PHP
+require_once 'vendor/autoload.php'; // If using Composer
+require_once 'path/to/php-mime-mail-parser/src/Parser.php'; // If installed manually
+Use code with caution. Learn more
+Now you can use the Parser class to parse emails:
+PHP
+$parser = new PhpMimeMailParser\Parser();
+$parser->setText($email_text); // Set the email text to parse
+
+// Access parsed data
+$headers = $parser->getHeaders();
+$body = $parser->getMessageBody();
+// ... other methods
+Use code with caution. Learn more
+Additional Notes:
+
+If you're working on a shared server without Composer or permission to install extensions, consider requesting the extensions from your hosting provider or using a different method to parse emails.
+Refer to the php-mime-mail-parser documentation for more details and usage examples: https://github.com/php-mime-mail-parser/php-mime-mail-parser

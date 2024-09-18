@@ -1,0 +1,101 @@
+BASIC MVC PROGRAM :
+
+user.php [ View file ]
+-----
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insert Data</title>
+</head>
+<body>
+    <h1>Insert Data</h1>
+    <form method="POST" action="">
+        <label for="username">Username:</label>
+        <input type="text" name="username" required><br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+controller.php [ Controller ]
+-----
+
+<?php
+require_once 'model.php';
+
+class Controller 
+{
+    private $model;
+
+    public function __construct() 
+	{
+        $this->model = new Model();
+    }
+
+    public function insert() 
+	{
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') 
+		{
+            $username = $_POST['username'];
+            $email = $_POST['email'];
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+            $result = $this->model->insertData($username, $email, $password);
+
+            if ($result) 
+			{
+                echo "Data inserted successfully.";
+            } 
+			else 
+			{
+                echo "Insertion failed.";
+            }
+        }
+
+        include 'view.php';
+    }
+}
+
+$controller = new Controller();
+$controller->insert();
+?>
+
+model.php [ Model ]
+-----
+
+<?php
+class Model 
+{
+    private $db;
+
+    public function __construct() 
+	{
+        $host = 'localhost';
+        $dbname = 'your_database_name';
+        $username = 'your_username';
+        $password = 'your_password';
+
+        try 
+		{
+            $this->db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } 
+		catch (PDOException $e) 
+		{
+            die("Database connection failed: " . $e->getMessage());
+        }
+    }
+
+    public function insertData($username, $email, $password) 
+	{
+        $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$username, $email, $password]);
+    }
+}
+?>
